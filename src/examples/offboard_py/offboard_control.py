@@ -4,6 +4,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from px4_msgs.msg import OffboardControlMode, TrajectorySetpoint, VehicleCommand, VehicleLocalPosition, VehicleStatus
+from geometry_msgs.msg import Twist
 
 
 class OffboardControl(Node):
@@ -12,10 +13,11 @@ class OffboardControl(Node):
     def __init__(self) -> None:
         super().__init__('offboard_control_takeoff_and_land')
 
+
         # Configure QoS profile for publishing and subscribing
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
-            durability=DurabilityPolicy.TRANSIENT_LOCAL,
+            # durability=DurabilityPolicy.TRANSIENT_LOCAL,
             history=HistoryPolicy.KEEP_LAST,
             depth=1
         )
@@ -27,18 +29,28 @@ class OffboardControl(Node):
             TrajectorySetpoint, '/fmu/in/trajectory_setpoint', qos_profile)
         self.vehicle_command_publisher = self.create_publisher(
             VehicleCommand, '/fmu/in/vehicle_command', qos_profile)
+        # self.vehicle_command_publisher = self.create_publisher(
+        #     VehicleCommand, '/fmu/in/vehicle_command', qos_profile)
 
         # Create subscribers
         self.vehicle_local_position_subscriber = self.create_subscription(
             VehicleLocalPosition, '/fmu/out/vehicle_local_position', self.vehicle_local_position_callback, qos_profile)
         self.vehicle_status_subscriber = self.create_subscription(
             VehicleStatus, '/fmu/out/vehicle_status', self.vehicle_status_callback, qos_profile)
+        self.keyboard_input_subscriber = self.create_subscription(
+            Twist, "/cmd_vel", self.keyboard_input_callback, qos_profile)
+
 
         # Initialize variables
         self.offboard_setpoint_counter = 0
         self.vehicle_local_position = VehicleLocalPosition()
         self.vehicle_status = VehicleStatus()
         self.takeoff_height = -5.0
+
+        self.x = 0.0
+        self.y = 0.0
+        self.z = -5.0
+        self.yaw = 1.57079
 
         # Create a timer to publish control commands
         self.timer = self.create_timer(0.1, self.timer_callback)
@@ -87,12 +99,23 @@ class OffboardControl(Node):
 
     def publish_position_setpoint(self, x: float, y: float, z: float):
         """Publish the trajectory setpoint."""
+        print(x,y,z)
         msg = TrajectorySetpoint()
         msg.position = [x, y, z]
-        msg.yaw = 1.57079  # (90 degree)
+        msg.yaw = self.yaw  # (90 degree)
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
-        self.get_logger().info(f"Publishing position setpoints {[x, y, z]}")
+        # self.get_logger().info(f"Publishing position setpoints {[x, y, z]}")
+
+    def keyboard_input_callback(self, msg):
+        """Convert Twist message to position setpoints."""
+        self.x += msg.linear.x * 0.1  # Scale factor for movement
+        self.y += msg.linear.y * 0.1
+        self.z -= msg.linear.z * 0.1
+        self.yaw += msg.angular.z * 0.05  # Adjust yaw with scale
+
+        self.get_logger().info(f"Received Twist: x={msg.linear.x}, y={msg.linear.y}, z={msg.linear.z}, yaw={msg.angular.z}")
+        self.get_logger().info(f"Updated position: x={self.x}, y={self.y}, z={self.z}, yaw={self.yaw}")
 
     def publish_vehicle_command(self, command, **params) -> None:
         """Publish a vehicle command."""
@@ -121,12 +144,13 @@ class OffboardControl(Node):
             self.engage_offboard_mode()
             self.arm()
 
-        if self.vehicle_local_position.z > self.takeoff_height and self.vehicle_status.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD:
-            self.publish_position_setpoint(0.0, 0.0, self.takeoff_height)
-
-        elif self.vehicle_local_position.z <= self.takeoff_height:
-            self.land()
-            exit(0)
+        # if self.vehicle_local_position.z > self.takeoff_height and self.vehicle_status.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD:
+        #     self.publish_position_setpoint(0.0, 0.0, self.z)
+        if self.vehicle_status.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD:
+            self.publish_position_setpoint(self.x, self.y, self.z)
+        # elif self.vehicle_local_position.z <= self.takeoff_height:
+        #     self.land()
+        #     exit(0)
 
         if self.offboard_setpoint_counter < 11:
             self.offboard_setpoint_counter += 1
