@@ -20,7 +20,7 @@ def generate_launch_description():
             output='screen'
         ),
         launch_ros.actions.Node(
-            package='px4_ros_com',
+            package='px4_keyboard_teleop_control',
             executable='offboard_control',
             output='screen',
             shell=True,

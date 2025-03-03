@@ -50,7 +50,7 @@ def generate_launch_description():
     )
 
     sensor_combined_listener_node = Node(
-        package='px4_ros_com',
+        package='px4_keyboard_teleop_control',
         executable='sensor_combined_listener',
         output='screen',
         shell=True,

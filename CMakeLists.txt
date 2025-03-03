@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(px4_ros_com)
+project(px4_keyboard_teleop_control)
 
 # Default to C99
 if(NOT CMAKE_C_STANDARD)
@@ -44,28 +44,14 @@ target_include_directories(frame_transforms PUBLIC
 )
 
 
-# examples/listeners/sensor_combined_listener
-add_executable(sensor_combined_listener src/examples/listeners/sensor_combined_listener.cpp)
-ament_target_dependencies(sensor_combined_listener rclcpp px4_msgs)
-install(TARGETS sensor_combined_listener DESTINATION lib/${PROJECT_NAME})
-
-# examples/listeners/vehicle_gps_position_listener
-add_executable(vehicle_gps_position_listener src/examples/listeners/vehicle_gps_position_listener.cpp)
-ament_target_dependencies(vehicle_gps_position_listener rclcpp px4_msgs)
-install(TARGETS vehicle_gps_position_listener DESTINATION lib/${PROJECT_NAME})
-
-# examples/advertisers/debug_vect_advertiser
-add_executable(debug_vect_advertiser src/examples/advertisers/debug_vect_advertiser.cpp)
-ament_target_dependencies(debug_vect_advertiser rclcpp px4_msgs)
-install(TARGETS debug_vect_advertiser DESTINATION lib/${PROJECT_NAME})
 
 # examples/offboard/offboard_control
-add_executable(offboard_control src/examples/offboard/offboard_control.cpp)
+add_executable(offboard_control src/offboard/offboard_control.cpp)
 ament_target_dependencies(offboard_control rclcpp px4_msgs geometry_msgs)
 install(TARGETS offboard_control DESTINATION lib/${PROJECT_NAME})
 
 # examples/offboard/offboard_control_srv
-add_executable(offboard_control_srv src/examples/offboard/offboard_control_srv.cpp)
+add_executable(offboard_control_srv src/offboard/offboard_control_srv.cpp)
 ament_target_dependencies(offboard_control_srv rclcpp px4_msgs)
 install(TARGETS offboard_control_srv DESTINATION lib/${PROJECT_NAME})
 
@@ -96,24 +82,6 @@ install(TARGETS frame_transforms
 # Install launch files.
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME}/)
 
-# Install tests
-install(DIRECTORY test DESTINATION share/${PROJECT_NAME}/)
-
-
-############
-# Testing ##
-############
-
-if(BUILD_TESTING)
-	find_package(ament_lint_auto REQUIRED)
-	# the following line skips the linter which checks for copyrights
-	# uncomment the line when a copyright and license is not present in all source files
-	#set(ament_cmake_copyright_FOUND TRUE)
-	# the following line skips cpplint (only works in a git repo)
-	# uncomment the line when this package is not in a git repo
-	#set(ament_cmake_cpplint_FOUND TRUE)
-	ament_lint_auto_find_test_dependencies()
-endif()
 
 ###########
 # Python ##
@@ -124,7 +92,7 @@ ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
 install(PROGRAMS
-  src/examples/offboard_py/offboard_control.py
+  src/offboard_py/offboard_control.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
