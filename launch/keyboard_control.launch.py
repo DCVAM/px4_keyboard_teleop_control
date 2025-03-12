@@ -9,10 +9,10 @@ def generate_launch_description():
 
     if is_tmux:
         # Split the current tmux window horizontally and run teleop_twist_keyboard
-        cmd = ['tmux', 'split-window', '-h', 'ros2', 'run', 'teleop_twist_keyboard', 'teleop_twist_keyboard']
+        cmd = ['tmux', 'split-window', '-h', 'ros2', 'run', 'px4_keyboard_teleop_control', 'teleop_node.py']
     else:
         # Run normally in a new terminal
-        cmd = ['gnome-terminal', '--', 'ros2', 'run', 'teleop_twist_keyboard', 'teleop_twist_keyboard']
+        cmd = ['gnome-terminal', '--', 'ros2', 'run', 'px4_keyboard_teleop_control', 'teleop_node.py']
 
     return launch.LaunchDescription([
         launch.actions.ExecuteProcess(

@@ -67,7 +67,7 @@ public:
 		trajectory_setpoint_publisher_ = this->create_publisher<TrajectorySetpoint>("/fmu/in/trajectory_setpoint", 10);
 		vehicle_command_publisher_ = this->create_publisher<VehicleCommand>("/fmu/in/vehicle_command", 10);
 
-		keyboard_input_subscriber_ = this->create_subscription<geometry_msgs::msg::Twist>("/cmd_vel", qos_profile, std::bind(&OffboardControl::keyboard_input_callback, this, std::placeholders::_1));
+		keyboard_input_subscriber_ = this->create_subscription<geometry_msgs::msg::Twist>("/keyboard_control_cmd", qos_profile, std::bind(&OffboardControl::keyboard_input_callback, this, std::placeholders::_1));
 		// vehicle_status_subscriber_ = this->create_subscription<VehicleStatus>("/fmu/out/vehicle_status_v1", qos_profile, std::bind(&OffboardControl::vehicle_status_callback, this, std::placeholders::_1));
 
 		offboard_setpoint_counter_ = 0;
@@ -114,8 +114,8 @@ private:
 	
 	float x = 0.0;
 	float y = 0.0;
-	float z = -5.0;
-	float yaw = -3.14;
+	float z = -2.5;
+	float yaw = 0;
 
 	void publish_offboard_control_mode();
 	void publish_trajectory_setpoint(float x, float y, float z, float yaw);
@@ -200,10 +200,10 @@ void OffboardControl::keyboard_input_callback(const geometry_msgs::msg::Twist &m
 	// std::cout << "help";
 	// vehicle_status_ = msg.NAVIGATION_STATE_OFFBOARD;
 
-	this->x += msg.linear.x * 0.1;
-	this->y += msg.linear.y * 0.1;
-	this->z -= msg.linear.z * 0.1;
-	// this->yaw += msg.angular.z * 0.05;
+	this->x = msg.linear.y;
+	this->y = -msg.linear.x;
+	this->z = -msg.linear.z;
+	this->yaw = msg.angular.z;
 }
 
 int main(int argc, char *argv[])
