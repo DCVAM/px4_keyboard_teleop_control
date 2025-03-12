@@ -60,13 +60,18 @@ ros2 launch px4_keyboard_teleop_control keyboard_control.launch.py
 ### Controls
 | Key | Action |
 |-----|--------|
-| `W` | Move Forward |
-| `S` | Move Backward |
-| `A` | Rotate Left |
-| `D` | Rotate Right |
-| `I` | Increase Altitude |
-| `K` | Decrease Altitude |
-| `SPACE` | Emergency Stop |
+| `w` | Increase Altitude |
+| `s` | Decrease Altitude |
+| `a` | Yaw Left |
+| `d` | Yaw Right |
+| `↑` | Move Forward |
+| `↓` | Move Forward |
+| `←` | Move Left |
+| `→` | Move Right |
+| `q` | Increase Linear Speed |
+| `x` | Decrease Linear Speed |
+| `e` | Increase Angular Speed |
+| `c` | Decrease Angular Speed |
 
 ## Testing & Validation
 This package has been tested on:
