@@ -1,21 +1,91 @@
-# PX4-ROS2 bridge
+# Keyboard Teleop: Twist Keyboard Control of PX4 Drones
 
-[![GitHub license](https://img.shields.io/github/license/PX4/px4_ros_com.svg)](https://github.com/PX4/px4_ros_com/blob/master/LICENSE) [![GitHub (pre-)release](https://img.shields.io/github/release-pre/PX4/px4_ros_com.svg)](https://github.com/PX4/px4_ros_com/releases/tag/beta) [![DOI](https://zenodo.org/badge/142936318.svg)](https://zenodo.org/badge/latestdoi/142936318) [![Build and Test package](https://github.com/PX4/px4_ros_com/workflows/Build%20and%20Test%20package/badge.svg?branch=master)](https://github.com/PX4/px4_ros_com/actions)
+## Overview
+This package provides a simple and efficient way to control PX4-based drones using a keyboard. Built on ROS 2, it enables seamless communication with the PX4 Autopilot via `geometry_msgs/Twist` commands, making it ideal for testing and manual control scenarios.
 
-[![Discord Shield](https://discordapp.com/api/guilds/1022170275984457759/widget.png?style=shield)](https://discord.gg/dronecode)
+This repository is inspired by [PX4/px4_ros_com](https://github.com/PX4/px4_ros_com/tree/main). Before using this package, it is highly recommended to read the official PX4 documentation: [PX4 User Guide](https://docs.px4.io/main/en/).
 
-This package provides example nodes for exchanging data and commands between ROS2 and PX4.
-It also provides a [library](./include/px4_ros_com/frame_transforms.h) to ease the conversion between ROS2 and PX4 frame conventions.
-It has a straight dependency on the [`px4_msgs`](https://github.com/PX4/px4_msgs) package.
+## Features
+- Direct keyboard-based control of PX4 drones.
+- Utilizes `cmd_vel` messages for velocity-based control.
+- Built with ROS 2 Humble and tested in Gazebo Harmonic.
 
-## Install, build and usage
+## Dependencies
+Ensure the following dependencies are installed before proceeding:
+- **ROS 2 Humble** (https://docs.ros.org/en/humble/index.html)
+- **PX4 Autopilot** (Stable version: **v1.15**) (https://github.com/PX4/PX4-Autopilot)
+- **px4_msgs package** (https://github.com/PX4/px4_msgs)
+- **QGroundControl** (for PX4 configuration and monitoring) (https://qgroundcontrol.com/)
+- **Micro XRCE-DDS Agent** (for PX4-ROS 2 communication) (https://github.com/eProsima/Micro-XRCE-DDS-Agent)
 
-Check the [uXRCE-DDS](https://docs.px4.io/main/en/middleware/uxrce_dds.html) and the [ROS2 Interface](https://docs.px4.io/main/en/ros/ros2_comm.html) sections on the PX4 Devguide for details on how to install the required dependencies, build the package and use it.
+## Installation
+### 1. Clone the Repository and `px4_msgs` package
+```bash
+mkdir -p ~/ros2_ws/src && cd ~/ros2_ws/src
+git clone https://github.com/PX4/px4_msgs.git
+git clone https://github.com/DCVAM/px4_keyboard_teleop_control.git
+```
 
-## Bug tracking and feature requests
+### 2. Build the Package 
+```bash
+cd ~/ros2_ws
+colcon build --symlink-install
+source install/setup.bash
+```
 
-Use the [Issues](https://github.com/PX4/px4_ros_com/issues) section to create a new issue. Report your issue or feature request [here](https://github.com/PX4/px4_ros_com/issues/new).
+## Usage
+### Run QGroundControl
+```bash
+cd /path/to/QGroundControl.AppImage
+./QGroundControl.AppImage
+```
 
-## Questions and troubleshooting
+### Run the Micro XRCE-DDS Agent
+```bash
+MicroXRCEAgent udp4 -p 8888
+```
 
-Reach the PX4 development team on the [PX4 Discord Server](https://discord.gg/dronecode).
+### Launch the PX4 SITL Environment
+```bash
+cd ~/PX4-Autopilot
+make px4_sitl gazebo
+```
+
+### Start the Keyboard Teleoperation Node
+```bash
+cd ~/ros2_ws
+ros2 launch px4_keyboard_teleop_control keyboard_control.launch.py
+```
+
+### Controls
+| Key | Action |
+|-----|--------|
+| `W` | Move Forward |
+| `S` | Move Backward |
+| `A` | Rotate Left |
+| `D` | Rotate Right |
+| `I` | Increase Altitude |
+| `K` | Decrease Altitude |
+| `SPACE` | Emergency Stop |
+
+## Testing & Validation
+This package has been tested on:
+- **PX4 Stable v1.15**
+- **ROS 2 Humble**
+- **Gazebo Harmonic**
+
+## Future Improvements
+- Integration with joystick/gamepad controllers.
+- Customizable key mappings.
+- Additional safety features.
+
+## License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+## Contributions
+Contributions are welcome! Please follow the standard GitHub workflow:
+1. Fork the repository.
+2. Create a feature branch.
+3. Submit a pull request.
+
+
