@@ -65,7 +65,7 @@ ros2 launch px4_keyboard_teleop_control keyboard_control.launch.py
 | `a` | Yaw Left |
 | `d` | Yaw Right |
 | `↑` | Move Forward |
-| `↓` | Move Forward |
+| `↓` | Move Backward |
 | `←` | Move Left |
 | `→` | Move Right |
 | `q` | Increase Linear Speed |
