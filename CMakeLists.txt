@@ -92,7 +92,7 @@ ament_python_install_package(${PROJECT_NAME})
 
 # Install Python executables
 install(PROGRAMS
-  src/offboard_py/offboard_control.py
+  src/keyboard_control/teleop_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
